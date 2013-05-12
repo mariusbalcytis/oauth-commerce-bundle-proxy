@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter id="maba_oauth_commerce.internal_client.signature_credentials" type="collection"/>
+    </parameters>
+
+    <services>
+        <service id="maba_oauth_commerce_proxy.client_manager"
+                 class="Maba\Bundle\OAuthCommerceProxyBundle\Manager\ClientManager">
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument type="service" id="maba_oauth_commerce.client.internal"/>
+            <argument type="service">
+                <service class="Doctrine\ORM\EntityRepository" factory-service="doctrine.orm.default_entity_manager"
+                         factory-method="getRepository">
+                    <argument>MabaOAuthCommerceCommonBundle:Client</argument>
+                </service>
+            </argument>
+        </service>
+        <service id="maba_oauth_commerce_proxy.application_manager"
+                 class="Maba\Bundle\OAuthCommerceProxyBundle\Manager\ApplicationManager">
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument type="service" id="maba_oauth_commerce.client.internal"/>
+        </service>
+
+        <service id="maba_oauth_commerce_proxy.access_token_code_manager" abstract="true"
+                 class="Maba\Bundle\OAuthCommerceProxyBundle\Manager\AccessTokenCodeManager">
+            <argument type="service" id="maba_oauth_commerce.client.internal"/>
+            <argument type="service" id="maba_oauth_commerce_proxy.client_manager"/>
+            <argument type="service" id="maba_oauth_commerce_proxy.session_storage"/>
+        </service>
+
+        <service id="maba_oauth_commerce_proxy.session_storage"
+                 class="Maba\Bundle\OAuthCommerceProxyBundle\Storage\DefaultSessionStorage">
+            <argument type="service" id="session"/>
+            <argument>maba_oauth_commerce_proxy.code_info.</argument>
+        </service>
+
+        <service id="maba_oauth_commerce.client.internal" class="Maba\OAuthCommerceInternalClient\InternalClient"
+                 factory-service="maba_oauth_commerce.factory.internal" factory-method="createClient">
+            <argument>%maba_oauth_commerce.internal_client.signature_credentials%</argument>
+        </service>
+
+        <service id="maba_oauth_commerce_proxy.security.authentication.provider"
+                 class="Maba\Bundle\OAuthCommerceProxyBundle\Security\ProxyAuthenticationProvider" public="false"/>
+
+        <service id="maba_oauth_commerce_proxy.security.authentication.listener"
+                 class="Maba\Bundle\OAuthCommerceProxyBundle\Security\ProxyAuthenticationListener" public="false">
+            <argument type="service" id="security.context"/>
+            <argument type="service" id="security.authentication.manager"/>
+            <argument type="service" id="logger"/>
+        </service>
+
+        <service id="maba_oauth_commerce_proxy.listener.view_listener"
+                 class="Maba\Bundle\OAuthCommerceProxyBundle\Listener\ViewListener">
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView"/>
+        </service>
+    </services>
+</container>

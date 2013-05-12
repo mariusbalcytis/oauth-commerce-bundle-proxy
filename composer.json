@@ -1,0 +1,22 @@
+{
+    "name": "maba-oauth-commerce/bundle-proxy",
+    "description": "Proxy bundle for OAuth Commerce",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marius Balčytis",
+            "email": "marius.balcytis@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/framework-bundle": "~2.1",
+        "symfony/security": "~2.1",
+        "maba-oauth-commerce/bundle-common": "*",
+        "maba-oauth-commerce/php-lib-internal": "*"
+    },
+    "autoload": {
+        "psr-0": { "Maba\\Bundle\\OAuthCommerceProxyBundle": "" }
+    },
+    "target-dir": "Maba/Bundle/OAuthCommerceProxyBundle"
+}
